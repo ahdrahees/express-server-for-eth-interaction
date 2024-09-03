@@ -16,7 +16,7 @@ mongoose.connect(process.env.MONG_URI, {
 const NFTMetadataSchema = new mongoose.Schema({
   contractAddress: { type: String, required: true },
   tokenId: { type: Number, min: 0 },
-  metadata: { type: String, required: true },
+  metadata: { type: mongoose.Schema.Types.Mixed, required: true },
 });
 
 // Create NFTMetadata model
@@ -106,13 +106,14 @@ app.get("/nft-metadata/:contractAddress/:tokenId", async (req, res) => {
       nftMetadata = new NFTMetadata({
         contractAddress,
         tokenId: Number(tokenId),
-        metadata: JSON.stringify(response.data),
+        // metadata: JSON.stringify(response.data),
+        metadata: response.data,
       });
       await nftMetadata.save();
 
       res.status(200).json(response.data);
     } else {
-      res.status(200).json(JSON.parse(nftMetadata.metadata));
+      res.status(200).json(nftMetadata.metadata);
     }
   } catch (error) {
     console.error(error);
